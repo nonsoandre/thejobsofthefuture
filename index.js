@@ -19,11 +19,6 @@ app.get('/gen-xx-site', async (req, res) => {
   return res.send('Hello World');
 });
 
-// job to run every second
-// cron.schedule('* * * * * *', async () => {
-//   console.log('sample job')
-// })
-
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Server running on port ${process.env.PORT || 3000}`);
 });
