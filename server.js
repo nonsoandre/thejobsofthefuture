@@ -81,7 +81,7 @@ async function getNewsArticles() {
       categories.map(async (category) => {
         const url = `https://newsapi.org/v2/everything?q=${category}&apiKey=${
           process.env.NEWS_API_KEY
-        }&pageSize=${process.env.NEWS_SIZE}&from=${getNowDate()}`;
+        }&pageSize=${process.env.NEWS_SIZE}&from=${getNowDate()}&language=en`;
         const response = await axios.get(url);
 
         return response.data.articles.map((article) => {
