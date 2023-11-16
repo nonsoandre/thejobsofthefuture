@@ -2,6 +2,12 @@ const dotenv = require('dotenv');
 const OpenAI = require('openai');
 const axios = require('axios');
 const FormData = require('form-data');
+const {
+  samplePost1,
+  samplePost2,
+  samplePost3,
+  samplePost4
+} = require('./sampleContent');
 
 dotenv.config();
 
@@ -67,14 +73,13 @@ async function getNewsArticles() {
     let categories = [
       'Web3',
       'Blockchain',
-      'Metaverse',
-      'Spatial Compute',
-      'Advanced Intelligence',
-      'ChatGPT',
-      'Bard.google.com',
-      'Mixed Reality',
-      'Augmented Reality',
-      'Extended Reality'
+      'Metaverse'
+      // 'Spatial Compute',
+      // 'Advanced Intelligence',
+      // 'ChatGPT',
+      // 'Mixed Reality',
+      // 'Augmented Reality',
+      // 'Extended Reality'
     ];
 
     const articles = await Promise.all(
@@ -92,6 +97,7 @@ async function getNewsArticles() {
         });
       })
     );
+
 
     // Process the retrieved articles
     return articles.flat();
@@ -115,8 +121,66 @@ async function summarizeNewsArticles(articles) {
         });
 
         const summary = completion.choices[0].text.trim();
+
+
         return {
           title: article.title,
+          content: summary,
+          status: 'publish', // Set the status to 'publish' to publish the post immediately
+          imageUrl: article.urlToImage,
+          categories: article.categories
+        };
+      })
+    );
+  } catch (error) {
+    console.error('Error summarizing news articles:', error);
+    throw error;
+  }
+}
+
+async function changeArticleTitle(originalTitle) {
+  try {
+    const response = await openai.completions.create({
+      model: chatGptModel,
+      prompt: `Rewrite the following article title to be similar but not the same:\n${originalTitle}\nNew Title:`,
+      max_tokens: 1000,
+      temperature: 0
+    });
+
+    const newTitle = response.choices[0].text.trim();
+    return newTitle;
+  } catch (error) {
+    console.error('Error in changing article title:', error);
+    return originalTitle;
+  }
+}
+
+async function summarizeNewsArticles2(articles) {
+  try {
+    return await Promise.all(
+      articles.map(async (article) => {
+        const samplePostExcerpt = `${samplePost1}`;
+
+        const instructions = `Using the style and structure of the above sample posts, create a blog article that first summarizes the content of the following article and then discusses how its themes relate to the jobs of the future. The blog post should have minimal sub-headings and be at least 700 words. note: don't include Blog Title : or Blog Content, i only need the content.`;
+
+        const articleInfo = `${article.title}. ${article.description}. ${article.content}`;
+
+        const prompt = `${samplePostExcerpt}\n\n${instructions}\n\nArticle Information:\n${articleInfo}`;
+
+        const completion = await openai.completions.create({
+          model: chatGptModel,
+          prompt: prompt,
+          max_tokens: 3000,
+          temperature: 0
+        });
+
+        const summary = completion.choices[0].text.trim();
+
+
+        const newTitle = await changeArticleTitle(article.title);
+
+        return {
+          title: newTitle,
           content: summary,
           status: 'publish', // Set the status to 'publish' to publish the post immediately
           imageUrl: article.urlToImage,
@@ -186,7 +250,8 @@ async function setFeaturedImage(imageUrl) {
 async function generateNewsFeed() {
   try {
     const newsArticles = await getNewsArticles();
-    const summaries = await summarizeNewsArticles(newsArticles);
+    // const summaries = await summarizeNewsArticles(newsArticles);
+    const summaries = await summarizeNewsArticles2(newsArticles);
 
     await Promise.all(
       summaries.map(async (summary) => {
