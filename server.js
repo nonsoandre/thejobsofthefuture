@@ -73,13 +73,13 @@ async function getNewsArticles() {
     let categories = [
       'Web3',
       'Blockchain',
-      'Metaverse'
-      // 'Spatial Compute',
-      // 'Advanced Intelligence',
-      // 'ChatGPT',
-      // 'Mixed Reality',
-      // 'Augmented Reality',
-      // 'Extended Reality'
+      'Metaverse',
+      'Spatial Compute',
+      'Advanced Intelligence',
+      'ChatGPT',
+      'Mixed Reality',
+      'Augmented Reality',
+      'Extended Reality'
     ];
 
     const articles = await Promise.all(
