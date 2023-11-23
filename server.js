@@ -47,14 +47,6 @@ const categoriesWithId = [
     id: 52
   },
   {
-    name: 'ChatGPT',
-    id: 52
-  },
-  {
-    name: 'Bard.google.com',
-    id: 52
-  },
-  {
     name: 'Mixed Reality',
     id: 32
   },
@@ -64,6 +56,22 @@ const categoriesWithId = [
   },
   {
     name: 'Extended Reality',
+    id: 32
+  },
+  {
+    name: 'Quantum Computing',
+    id: 32
+  },
+  {
+    name: 'Virtual Reality',
+    id: 32
+  },
+  {
+    name: 'Augmented Reality',
+    id: 32
+  },
+  {
+    name: 'Internet of Things',
     id: 32
   }
 ];
@@ -76,34 +84,35 @@ async function getNewsArticles() {
       'Metaverse',
       'Spatial Compute',
       'Advanced Intelligence',
-      'ChatGPT',
       'Mixed Reality',
       'Augmented Reality',
-      'Extended Reality'
+      'Extended Reality',
+      'Quantum Computing',
+      'Virtual Reality',
+      'Augmented Reality',
+      'Internet of Things'
     ];
 
     const articles = await Promise.all(
       categories.map(async (category) => {
-        const url = `https://newsapi.org/v2/everything?q=${category}&apiKey=${
+        const url = `https://newsapi.org/v2/everything?q=${category} -politics -"political" -"government" -"election"&apiKey=${
           process.env.NEWS_API_KEY
         }&pageSize=${process.env.NEWS_SIZE}&from=${getNowDate()}&language=en`;
         const response = await axios.get(url);
 
         return response.data.articles.map((article) => {
           article.categories = [
-            categoriesWithId.find((c) => c.name === category).id
+            categoriesWithId.find((c) => c.name === category)?.id
           ];
           return article;
         });
       })
     );
 
-
     // Process the retrieved articles
     return articles.flat();
   } catch (error) {
     console.error('Error retrieving news articles:', error);
-    throw error;
   }
 }
 
@@ -122,7 +131,6 @@ async function summarizeNewsArticles(articles) {
 
         const summary = completion.choices[0].text.trim();
 
-
         return {
           title: article.title,
           content: summary,
@@ -134,7 +142,6 @@ async function summarizeNewsArticles(articles) {
     );
   } catch (error) {
     console.error('Error summarizing news articles:', error);
-    throw error;
   }
 }
 
@@ -159,9 +166,23 @@ async function summarizeNewsArticles2(articles) {
   try {
     return await Promise.all(
       articles.map(async (article) => {
-        const samplePostExcerpt = `${samplePost1}`;
+        // const samplePostExcerpt = `${samplePost1}`;
 
-        const instructions = `Using the style and structure of the above sample posts, create a blog article that first summarizes the content of the following article and then discusses how its themes relate to the jobs of the future. The blog post should have minimal sub-headings and be at least 700 words. note: don't include Blog Title : or Blog Content, i only need the content.`;
+        // const instructions = `Using the style and structure of the above sample posts, create a blog article that first summarizes the content of the following article and then discusses how its themes relate to the jobs of the future. The blog post should have minimal sub-headings and be at least 700 words. note: don't include Blog Title : or Blog Content, i only need the content.`;
+
+        // const articleInfo = `${article.title}. ${article.description}. ${article.content}`;
+
+        // const prompt = `${samplePostExcerpt}\n\n${instructions}\n\nArticle Information:\n${articleInfo}`;
+
+        // const completion = await openai.completions.create({
+        //   model: chatGptModel,
+        //   prompt: prompt,
+        //   max_tokens: 3000,
+        //   temperature: 0
+        // });
+
+        const samplePostExcerpt = `${samplePost1}`; // note: the sample post here is a sample of article style
+        const instructions = `Using the style and structure of the above sample posts, create a blog article that first summarizes the content of the following article and then discusses how its themes relate to the jobs of the future. The blog post should be engaging and thought-provoking, aiming to retain the reader's interest throughout. It should provide not only a summary but also insightful elaboration on key points. Include relevant analogies, examples, and personal insights to make the content more relatable and share-worthy. The blog should encourage the reader to think deeply about the subject and feel compelled to share it for its value. The article should be less than 1500 words with minimal sub-headings. note: don't include Blog Title : or Blog Content, i only need the content.`;
 
         const articleInfo = `${article.title}. ${article.description}. ${article.content}`;
 
@@ -171,11 +192,12 @@ async function summarizeNewsArticles2(articles) {
           model: chatGptModel,
           prompt: prompt,
           max_tokens: 3000,
-          temperature: 0
+          temperature: 0.7 // Adjusted for creativity and variability
         });
 
         const summary = completion.choices[0].text.trim();
 
+        console.log('summary', summary);
 
         const newTitle = await changeArticleTitle(article.title);
 
@@ -264,6 +286,15 @@ async function generateNewsFeed() {
     console.error('Error generating news feed:', error);
   }
 }
+
+// async function test() {
+//   const articles = await getNewsArticles();
+//   console.log('articles', articles);
+//   const summaries = await summarizeNewsArticles2(articles);
+//   console.log('summaries', summaries);
+// }
+
+// test();
 
 module.exports = {
   generateNewsFeed
