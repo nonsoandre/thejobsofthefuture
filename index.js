@@ -24,7 +24,7 @@ app.get('/ping', async (req, res) => {
 
 app.get('/gen-xx-site', async (req, res) => {
   try {
-    await generateNewsFeed();
+    generateNewsFeed();
 
     return res.status(200).json({
       success: true,
