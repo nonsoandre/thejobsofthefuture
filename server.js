@@ -107,8 +107,22 @@ async function getNewsArticles() {
       })
     );
 
+    const flattenedArticles = articles.flat();
+
+    const uniqueTitles = {};
+
+    const uniqueDatas = flattenedArticles.filter((article) => {
+      if (!uniqueTitles[article.title]) {
+        uniqueTitles[article.title] = true;
+        return true;
+      }
+      return false;
+    });
+
+    const trimmedPosts = uniqueDatas.splice(0, 10);
+
     // Process the retrieved articles
-    return articles.flat();
+    return trimmedPosts;
   } catch (error) {
     console.error('Error retrieving news articles:', error);
   }
@@ -296,6 +310,7 @@ async function summarizeArticlesWithIntervals(articles) {
   for (const article of articles) {
     try {
       const summary = await summarizeArticle(article);
+      console.log('=== processed summary ====');
 
       summarizedArticles.push(summary);
 
@@ -314,7 +329,6 @@ async function summarizeArticlesWithIntervals(articles) {
 // async function test() {
 //   const articles = await getNewsArticles();
 //   console.log('articles', articles);
-
 //   const summaries = await summarizeArticlesWithIntervals(articles);
 //   console.log('summaries', summaries);
 // }
