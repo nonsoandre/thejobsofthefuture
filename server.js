@@ -6,11 +6,10 @@ const { samplePost1 } = require('./sampleContent');
 
 dotenv.config();
 
-const coolDownDelay = 2000;
-
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-// const chatGptModel = 'text-davinci-003';
 const chatGptModel = 'gpt-3.5-turbo-16k';
+
+let tryCount = 0;
 
 function getNowDate() {
   const currentDate = new Date(); // Get the current date
@@ -145,51 +144,6 @@ async function changeArticleTitle(originalTitle) {
   }
 }
 
-async function summarizeNewsArticles(articles) {
-  try {
-    return await Promise.all(
-      articles.map(async (article) => {
-        const samplePostExcerpt = `${samplePost1}`; // note: the sample post here is a sample of article style
-        const instructions = `Using the style and structure of the above sample posts, create a blog article that first summarizes the content of the following article and then discusses how its themes relate to the jobs of the future. The blog post should be engaging and thought-provoking, aiming to retain the reader's interest throughout. It should provide not only a summary but also insightful elaboration on key points. Include relevant analogies, examples, and personal insights to make the content more relatable and share-worthy. The blog should encourage the reader to think deeply about the subject and feel compelled to share it for its value. The article should be less than 1500 words with minimal sub-headings. note: don't include Blog Title : or Blog Content, i only need the content.`;
-
-        const articleInfo = `${article.title}. ${article.description}. ${article.content}`;
-
-        const prompt = `${samplePostExcerpt}\n\n${instructions}\n\nArticle Information:\n${articleInfo}`;
-
-        const completion = await openai.chat.completions.create({
-          model: 'gpt-4',
-          messages: [
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          temperature: 1,
-          max_tokens: 6000,
-          top_p: 1,
-          frequency_penalty: 0,
-          presence_penalty: 0
-        });
-
-        const summary = completion.choices[0].message;
-
-        const newTitle = await changeArticleTitle(article.title);
-
-        return {
-          title: newTitle,
-          content: summary,
-          status: 'publish', // Set the status to 'publish' to publish the post immediately
-          imageUrl: article.urlToImage,
-          categories: article.categories
-        };
-      })
-    );
-  } catch (error) {
-    console.error('Error summarizing news articles:', error);
-    throw error;
-  }
-}
-
 async function summarizeArticle(article) {
   const samplePostExcerpt = `${samplePost1}`; // note: the sample post here is a sample of article style
   const instructions = `Using the style and structure of the above sample posts, create a blog article that first summarizes the content of the following article and then discusses how its themes relate to the jobs of the future. The blog post should be engaging and thought-provoking, aiming to retain the reader's interest throughout. It should provide not only a summary but also insightful elaboration on key points. Include relevant analogies, examples, and personal insights to make the content more relatable and share-worthy. The blog should encourage the reader to think deeply about the subject and feel compelled to share it for its value. The article should be less than 1500 words with minimal sub-headings. note: don't include Blog Title : or Blog Content, i only need the content.`;
@@ -199,7 +153,7 @@ async function summarizeArticle(article) {
   const prompt = `${samplePostExcerpt}\n\n${instructions}\n\nArticle Information:\n${articleInfo}`;
 
   const completion = await openai.chat.completions.create({
-    model: 'gpt-4',
+    model: chatGptModel,
     messages: [
       {
         role: 'user',
@@ -280,10 +234,10 @@ async function setFeaturedImage(imageUrl) {
 }
 
 async function generateNewsFeed() {
+  console.log({ tryCount });
   try {
     const newsArticles = await getNewsArticles();
 
-    // const summaries = await summarizeNewsArticles(newsArticles);
     const summaries = await summarizeArticlesWithIntervals(newsArticles);
 
     await Promise.all(
@@ -295,46 +249,46 @@ async function generateNewsFeed() {
     console.log('Blog post successfully pushed to webhook');
   } catch (error) {
     console.error('Error generating news feed:', error);
+    if (tryCount <= 2) {
+      generateNewsFeed();
+      tryCount++;
+    }
   }
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function summarizeArticlesWithIntervals(articles) {
   const summarizedArticles = [];
 
+  console.time();
   console.log('summarizeArticlesWithIntervals started ===== ');
 
-  for (const article of articles) {
-    try {
-      const summary = await summarizeArticle(article);
-      console.log('=== processed summary ====');
-
-      summarizedArticles.push(summary);
-
-      // delay next summary
-      await sleep(coolDownDelay);
-    } catch (error) {
-      console.error('Error summarizing article : ', error);
-    }
+  try {
+    await Promise.all(
+      articles.map(async (article) => {
+        const summary = await summarizeArticle(article);
+        summarizedArticles.push(summary);
+      })
+    );
+  } catch (error) {
+    console.error('error occurred at summarizeArticlesWithIntervals : ', error);
   }
 
   console.log('summarizeArticlesWithIntervals completed ===== ');
+  console.timeEnd();
 
   return summarizedArticles;
 }
 
-// async function test() {
-//   const articles = await getNewsArticles();
-//   console.log('articles', articles);
-//   const summaries = await summarizeArticlesWithIntervals(articles);
-//   console.log('summaries', summaries);
-// }
+async function test() {
+  const articles = await getNewsArticles();
+  console.log('articles', articles);
+  const summaries = await summarizeArticlesWithIntervals(articles);
+  console.log('summaries', summaries);
+}
 
 // test();
 
 module.exports = {
-  generateNewsFeed
+  generateNewsFeed,
+  getNewsArticles
 };
