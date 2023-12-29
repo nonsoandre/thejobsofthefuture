@@ -236,6 +236,10 @@ async function setFeaturedImage(imageUrl) {
 async function generateNewsFeed() {
   console.log({ tryCount });
   try {
+    const newInterval = setInterval(async () => {
+      console.log('processing news feed generation');
+    }, 30 * 1000);
+
     const newsArticles = await getNewsArticles();
 
     const summaries = await summarizeArticlesWithIntervals(newsArticles);
@@ -245,6 +249,8 @@ async function generateNewsFeed() {
         await pushToWebhook(summary);
       })
     );
+
+    clearInterval(newInterval);
 
     console.log('Blog post successfully pushed to webhook');
   } catch (error) {

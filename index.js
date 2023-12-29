@@ -24,7 +24,7 @@ app.get('/ping', async (req, res) => {
 
 app.get('/gen-xx-site', async (req, res) => {
   try {
-    generateNewsFeed();
+    await generateNewsFeed();
 
     return res.status(200).json({
       success: true,
@@ -40,6 +40,6 @@ app.get('/gen-xx-site', async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 4000, () => {
-  console.log(`Server running on port ${process.env.PORT || 4000}`);
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server running on port ${process.env.PORT || 3000}`);
 });
