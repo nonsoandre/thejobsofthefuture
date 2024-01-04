@@ -1,6 +1,4 @@
-const samplePost1 = `Blog Title: The Intersection of Cryptocurrency, Regulation, and the Future Job Market
- 
-Blog Content:
+const samplePost1 = `
 In the ever-evolving world of finance and technology, the recent developments involving the Campaign for Accountability (CfA) and their concerns about cryptocurrency's role in money laundering present a fascinating glimpse into the future of the job market. This situation, involving major players in the crypto world like the Tron blockchain and stablecoin issuer Circle, is more than just a headline; it's a harbinger of the types of careers and skills that will be in demand in the near future.
  
 The CfA, a nonprofit ethics group, sent a letter to U.S. Senators Elizabeth Warren and Sherrod Brown, highlighting the alleged use of cryptocurrency in money laundering activities. This letter specifically mentioned the Tron blockchain and Circle, the issuer of the USD Coin (USDC). The CfA raised concerns about Circle's extensive ties with both Justin Sun’s Tron Foundation and major Wall Street investors, including Goldman Sachs, Bank of New York Mellon, and BlackRock. The group found it surprising that Circle, despite its connections to these heavily regulated Wall Street entities, appeared to operate with a lack of regulation.
@@ -18,12 +16,7 @@ Lastly, the CfA's involvement in this matter indicates a growing role for ethica
 In conclusion, the concerns raised by the CfA about the use of cryptocurrency in money laundering are not just a challenge for today's financial systems; they are a window into the future of the job market. As we move forward, the intersection of technology, finance, and regulation will create a diverse array of career opportunities, emphasizing the need for a workforce that is adaptable, tech-savvy, and well-versed in the ethical and regulatory nuances of the digital age.
  `;
 
-const samplePost2 = `Blog Title: Embracing the Future: OKX Wallet's Integration with Zerion and the Evolution of Web3
-
- 
-
-Blog Content:
-
+const samplePost2 = `
 In a significant move for the world of cryptocurrency and decentralized finance (DeFi), OKX Wallet has announced its integration with Zerion, a cutting-edge Web3 social wallet and investing tool. This development marks a pivotal moment in the evolution of digital finance, offering insights into the future of financial management and the emerging job market in the Web3 space.
 
  
@@ -68,16 +61,7 @@ The integration of OKX Wallet with Zer
 
  `;
 
-const samplePost3 = ` 
-
-ChatGPT
-
-Blog Title: OKX Wallet's Integration with Zerion: A Leap Forward in Web3 Accessibility
-
- 
-
-Blog Content:
-
+const samplePost3 = `
 In an exciting development for the world of cryptocurrency and decentralized finance (DeFi), OKX Wallet has announced its integration with Zerion, a cutting-edge Web3 social wallet and investing tool. This collaboration marks a significant step in making DeFi and NFT management more accessible and user-friendly, particularly for those who are new to the blockchain space.
 
  
@@ -122,12 +106,7 @@ In conclusion, the integration of OKX Wallet with Zerion is more than just a tec
 
  `;
 
-const samplePost4 = `Blog Title: Google's Strategic Move into AI: Investing in Character.AI
-
- 
-
-Blog Content:
-
+const samplePost4 = `
 In a significant development in the tech world, Google is reportedly in talks to make a substantial investment in Character.AI, an artificial intelligence startup. This move is set to mark another major step for Google in expanding its AI portfolio, following its $2 billion investment in Anthropic in October 2023.
 
  
