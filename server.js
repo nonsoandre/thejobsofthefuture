@@ -129,14 +129,23 @@ async function getNewsArticles() {
 
 async function changeArticleTitle(originalTitle) {
   try {
-    const response = await openai.completions.create({
-      model: 'text-davinci-003',
-      prompt: `Rewrite the following article title to be similar but not the same:\n${originalTitle}\nNew Title:`,
+    const response = await openai.chat.completions.create({
+      model: chatGptModel,
+      messages: [
+        {
+          role: 'user',
+          content: `Rewrite the following article title to be similar but not the same:\n${originalTitle}\nNew Title:`
+        }
+      ],
+      temperature: 0,
       max_tokens: 1000,
-      temperature: 0
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0
     });
 
-    const newTitle = response.choices[0].text.trim();
+    const newTitle = response.choices[0].message.content.trim();
+
     return newTitle;
   } catch (error) {
     console.error('Error in changing article title:', error);
