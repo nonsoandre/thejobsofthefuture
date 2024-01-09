@@ -127,14 +127,14 @@ async function getNewsArticles() {
   }
 }
 
-async function changeArticleTitle(originalTitle) {
+async function changeArticleTitle(originalTitle, summary) {
   try {
     const response = await openai.chat.completions.create({
       model: chatGptModel,
       messages: [
         {
           role: 'user',
-          content: `Rewrite the following article title to be similar but not the same:\n${originalTitle}\nNew Title:`
+          content: `Rewrite the following article title to be similar but not the same:\n${originalTitle} and it should be related to this article: ${summary}\nNew Title:`
         }
       ],
       temperature: 0,
@@ -178,7 +178,7 @@ async function summarizeArticle(article) {
 
   const summary = completion.choices[0].message.content;
 
-  const newTitle = await changeArticleTitle(article.title);
+  const newTitle = await changeArticleTitle(article.title, summary);
 
   return {
     title: newTitle,
