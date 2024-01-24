@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 const OpenAI = require('openai');
 const axios = require('axios');
 const FormData = require('form-data');
-const { samplePost1 } = require('./sampleContent');
+const { PROMPTS } = require('./prompts');
 
 dotenv.config();
 
@@ -154,19 +154,12 @@ async function changeArticleTitle(originalTitle, summary) {
 }
 
 async function summarizeArticle(article) {
-  const samplePostExcerpt = `${samplePost1}`; // note: the sample post here is a sample of article style
-  const instructions = `Using the style and structure of the above sample posts, create a blog article that first summarizes the content of the following article and then discusses how its themes relate to the jobs of the future. The blog post should be engaging and thought-provoking, aiming to retain the reader's interest throughout. It should provide not only a summary but also insightful elaboration on key points. Include relevant analogies, examples, and personal insights to make the content more relatable and share-worthy. The blog should encourage the reader to think deeply about the subject and feel compelled to share it for its value. The article should be less than 1500 words with minimal sub-headings. note: don't include Blog Title, Summary or Blog Content at start of summary or body of summary, i only need the content.`;
-
-  const articleInfo = `${article.title}. ${article.description}. ${article.content}`;
-
-  const prompt = `${samplePostExcerpt}\n\n${instructions}\n\nArticle Information:\n${articleInfo}`;
-
   const completion = await openai.chat.completions.create({
     model: chatGptModel,
     messages: [
       {
         role: 'user',
-        content: prompt
+        content: PROMPTS.type_two(article)
       }
     ],
     temperature: 1,
@@ -300,8 +293,6 @@ async function test() {
   const summaries = await summarizeArticlesWithIntervals(articles);
   console.log('summaries', summaries);
 }
-
-// test();
 
 module.exports = {
   generateNewsFeed,
