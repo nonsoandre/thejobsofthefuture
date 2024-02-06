@@ -76,18 +76,18 @@ const categoriesWithId = [
 async function getNewsArticles() {
   try {
     let categories = [
-      'Web3',
-      'Blockchain',
-      'Metaverse',
-      'Spatial Compute',
-      'Advanced Intelligence',
-      'Mixed Reality',
-      'Augmented Reality',
-      'Extended Reality',
-      'Quantum Computing',
-      'Virtual Reality',
-      'Augmented Reality',
-      'Internet of Things'
+      'Web3'
+      // 'Blockchain',
+      // 'Metaverse',
+      // 'Spatial Compute',
+      // 'Advanced Intelligence',
+      // 'Mixed Reality',
+      // 'Augmented Reality',
+      // 'Extended Reality',
+      // 'Quantum Computing',
+      // 'Virtual Reality',
+      // 'Augmented Reality',
+      // 'Internet of Things'
     ];
 
     const articles = await Promise.all(
@@ -169,13 +169,22 @@ async function summarizeArticle(article) {
     presence_penalty: 0
   });
 
-  const summary = completion.choices[0].message.content;
+  let summary = completion.choices[0].message.content;
 
   const newTitle = await changeArticleTitle(article.title, summary);
 
+  console.log({ summary, newTitle });
+
+  const audioBuffer = await textToSpeech(summary);
+  const uploadedMedia = await uploadAudioToWordPress(
+    audioBuffer,
+    `${newTitle.replace(/\s/g, '-')}-tts.mp3`
+  );
+
   return {
     title: newTitle,
-    content: summary,
+    content: `<p class="has-text-align-center"><strong>Prefer to listen?</strong>&nbsp;No problem!&nbsp;We've created an audio version for your convenience.&nbsp;Press play and relax while you absorb the information.</p>
+    <figure class="wp-block-audio"><audio controls src="${uploadedMedia.url}"></audio></figure>\n\n${summary}`,
     status: 'publish', // Set the status to 'publish' to publish the post immediately
     imageUrl: article.urlToImage,
     categories: article.categories
@@ -284,15 +293,69 @@ async function summarizeArticlesWithIntervals(articles) {
   console.log('summarizeArticlesWithIntervals completed ===== ');
   console.timeEnd();
 
+  console.log({ summarizedArticles });
+
   return summarizedArticles;
 }
 
-async function test() {
-  const articles = await getNewsArticles();
-  console.log('articles', articles);
-  const summaries = await summarizeArticlesWithIntervals(articles);
-  console.log('summaries', summaries);
+async function textToSpeech(text) {
+  try {
+    const mp3 = await openai.audio.speech.create({
+      model: 'tts-1',
+      voice: 'alloy',
+      input: text
+    });
+    console.log('mp3', mp3);
+
+    const buffer = Buffer.from(await mp3.arrayBuffer());
+    // await fs.promises.writeFile(speechFile, buffer); // since buffer is being used , no need to save to file storage
+
+    console.log({ buffer });
+
+    return buffer;
+  } catch (error) {
+    console.error('textToSpeech error :', error);
+  }
 }
+
+async function uploadAudioToWordPress(audioBuffer, filename) {
+  try {
+    const formData = new FormData();
+    // Assuming `audioBuffer` is already a Buffer instance. If not, you might need to convert it similar to the image upload example
+    formData.append('file', audioBuffer, filename);
+
+    const uploadUrl = `${process.env.WEB_URL}/wp-json/wp/v2/media`;
+
+    const response = await axios.post(uploadUrl, formData, {
+      headers: {
+        ...formData.getHeaders(), // This automatically sets the Content-Type to multipart/form-data with the correct boundary
+        Authorization: `Basic ${Buffer.from(
+          `${process.env.WEB_SITE_USERNAME}:${process.env.WEB_SITE_APPLICATION_KEY}`
+        ).toString('base64')}`
+      }
+    });
+
+    console.log('Audio upload successful. Media ID:', response.data.id);
+    return { id: response.data.id, url: response.data.source_url };
+  } catch (error) {
+    console.error(
+      'Error uploading audio to WordPress:',
+      error.response?.data || error.message
+    );
+  }
+}
+
+async function test() {
+  // const articles = await getNewsArticles();
+  // console.log('articles', articles);
+  // const summaries = await summarizeArticlesWithIntervals(articles);
+  // console.log('summaries', summaries);
+
+  const articles = await getNewsArticles()
+  console.log({articles});
+}
+
+test();
 
 module.exports = {
   generateNewsFeed,
