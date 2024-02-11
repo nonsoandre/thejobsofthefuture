@@ -76,18 +76,18 @@ const categoriesWithId = [
 async function getNewsArticles() {
   try {
     let categories = [
-      'Web3'
-      // 'Blockchain',
-      // 'Metaverse',
-      // 'Spatial Compute',
-      // 'Advanced Intelligence',
-      // 'Mixed Reality',
-      // 'Augmented Reality',
-      // 'Extended Reality',
-      // 'Quantum Computing',
-      // 'Virtual Reality',
-      // 'Augmented Reality',
-      // 'Internet of Things'
+      'Web3',
+      'Blockchain',
+      'Metaverse',
+      'Spatial Compute',
+      'Advanced Intelligence',
+      'Mixed Reality',
+      'Augmented Reality',
+      'Extended Reality',
+      'Quantum Computing',
+      'Virtual Reality',
+      'Augmented Reality',
+      'Internet of Things'
     ];
 
     const articles = await Promise.all(
@@ -171,11 +171,11 @@ async function summarizeArticle(article) {
 
   let summary = completion.choices[0].message.content;
 
-  const newTitle = await changeArticleTitle(article.title, summary);
+  const [newTitle, audioBuffer] = await Promise.all([
+    changeArticleTitle(article.title, summary),
+    textToSpeech(summary)
+  ])
 
-  console.log({ summary, newTitle });
-
-  const audioBuffer = await textToSpeech(summary);
   const uploadedMedia = await uploadAudioToWordPress(
     audioBuffer,
     `${newTitle.replace(/\s/g, '-')}-tts.mp3`
@@ -249,7 +249,7 @@ async function generateNewsFeed() {
   try {
     const newInterval = setInterval(async () => {
       console.log('processing news feed generation');
-    }, 30 * 1000);
+    }, 2000);
 
     const newsArticles = await getNewsArticles();
 
@@ -346,16 +346,13 @@ async function uploadAudioToWordPress(audioBuffer, filename) {
 }
 
 async function test() {
-  // const articles = await getNewsArticles();
-  // console.log('articles', articles);
-  // const summaries = await summarizeArticlesWithIntervals(articles);
-  // console.log('summaries', summaries);
-
-  const articles = await getNewsArticles()
-  console.log({articles});
+  const articles = await getNewsArticles();
+  console.log('articles', articles);
+  const summaries = await summarizeArticlesWithIntervals(articles);
+  console.log('summaries', summaries);
 }
 
-test();
+// test();
 
 module.exports = {
   generateNewsFeed,

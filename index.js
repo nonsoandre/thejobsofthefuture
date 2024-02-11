@@ -24,6 +24,9 @@ app.get('/ping', async (req, res) => {
 
 app.get('/gen-xx-site', async (req, res) => {
   try {
+    // Increase timeout for this request to 10 minutes
+    req.setTimeout(600000);
+
     await generateNewsFeed();
 
     return res.status(200).json({
