@@ -174,7 +174,7 @@ async function summarizeArticle(article) {
   const [newTitle, audioBuffer] = await Promise.all([
     changeArticleTitle(article.title, summary),
     textToSpeech(summary)
-  ])
+  ]);
 
   const uploadedMedia = await uploadAudioToWordPress(
     audioBuffer,
@@ -183,8 +183,8 @@ async function summarizeArticle(article) {
 
   return {
     title: newTitle,
-    content: `<p class="has-text-align-center"><strong>Prefer to listen?</strong>&nbsp;No problem!&nbsp;We've created an audio version for your convenience.&nbsp;Press play and relax while you absorb the information.</p>
-    <figure class="wp-block-audio"><audio controls src="${uploadedMedia.url}"></audio></figure>\n\n${summary}`,
+    content: `${summary}\n\n<p class="has-text-align-center"><strong>Prefer to listen?</strong>&nbsp;No problem!&nbsp;We've created an audio version for your convenience.&nbsp;Press play and relax while you absorb the information.</p>
+    <figure class="wp-block-audio"><audio controls src="${uploadedMedia.url}"></audio></figure>`,
     status: 'publish', // Set the status to 'publish' to publish the post immediately
     imageUrl: article.urlToImage,
     categories: article.categories
@@ -305,12 +305,9 @@ async function textToSpeech(text) {
       voice: 'alloy',
       input: text
     });
-    console.log('mp3', mp3);
 
     const buffer = Buffer.from(await mp3.arrayBuffer());
     // await fs.promises.writeFile(speechFile, buffer); // since buffer is being used , no need to save to file storage
-
-    console.log({ buffer });
 
     return buffer;
   } catch (error) {
