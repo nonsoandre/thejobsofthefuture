@@ -181,10 +181,18 @@ async function summarizeArticle(article) {
     `${newTitle.replace(/\s/g, '-')}-tts.mp3`
   );
 
+  if (!uploadedMedia) {
+    console.error('Error uploading audio to WordPress:', audioBuffer);
+  }
+
   return {
     title: newTitle,
     content: `${summary}\n\n<p class="has-text-align-center"><strong>Prefer to listen?</strong>&nbsp;No problem!&nbsp;We've created an audio version for your convenience.&nbsp;Press play and relax while you absorb the information.</p>
-    <figure class="wp-block-audio"><audio controls src="${uploadedMedia.url}"></audio></figure>`,
+   ${
+     uploadedMedia &&
+     uploadedMedia?.url &&
+     `<figure class="wp-block-audio"><audio controls src="${uploadedMedia?.url}"></audio></figure>`
+   }`,
     status: 'publish', // Set the status to 'publish' to publish the post immediately
     imageUrl: article.urlToImage,
     categories: article.categories
@@ -333,7 +341,7 @@ async function uploadAudioToWordPress(audioBuffer, filename) {
     });
 
     console.log('Audio upload successful. Media ID:', response.data.id);
-    return { id: response.data.id, url: response.data.source_url };
+    return { id: response?.data?.id, url: response?.data?.source_url };
   } catch (error) {
     console.error(
       'Error uploading audio to WordPress:',
