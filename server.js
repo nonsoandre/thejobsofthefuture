@@ -159,7 +159,7 @@ async function summarizeArticle(article) {
     messages: [
       {
         role: 'user',
-        content: PROMPTS.type_two(article)
+        content: PROMPTS.type_three(article)
       }
     ],
     temperature: 1,
@@ -187,12 +187,12 @@ async function summarizeArticle(article) {
 
   return {
     title: newTitle,
-    content: `${summary}\n\n<p class="has-text-align-center"><strong>Prefer to listen?</strong>&nbsp;No problem!&nbsp;We've created an audio version for your convenience.&nbsp;Press play and relax while you absorb the information.</p>
-   ${
-     uploadedMedia &&
-     uploadedMedia?.url &&
-     `<figure class="wp-block-audio"><audio controls src="${uploadedMedia?.url}"></audio></figure>`
-   }`,
+    content: `${summary}\n #LetsConnect, #Blockchain, #GenAI, #SpatialCompute, #Metaverse, #JobsOfTheFuture ${
+      uploadedMedia &&
+      uploadedMedia?.url &&
+      `\n\n<p class="has-text-align-center"><strong>Prefer to listen?</strong>&nbsp;No problem!&nbsp;We've created an audio version for your convenience.&nbsp;Press play and relax while you absorb the information.</p>
+     <figure class="wp-block-audio"><audio controls src="${uploadedMedia?.url}"></audio></figure>`
+    }`,
     status: 'publish', // Set the status to 'publish' to publish the post immediately
     imageUrl: article.urlToImage,
     categories: article.categories
@@ -345,7 +345,8 @@ async function uploadAudioToWordPress(audioBuffer, filename) {
   } catch (error) {
     console.error(
       'Error uploading audio to WordPress:',
-      error.response?.data || error.message
+      error.response?.data || error.message,
+      error.stack
     );
   }
 }
@@ -353,7 +354,7 @@ async function uploadAudioToWordPress(audioBuffer, filename) {
 async function test() {
   const articles = await getNewsArticles();
   console.log('articles', articles);
-  const summaries = await summarizeArticlesWithIntervals(articles);
+  const summaries = await summarizeArticlesWithIntervals(articles.slice(0,2));
   console.log('summaries', summaries);
 }
 

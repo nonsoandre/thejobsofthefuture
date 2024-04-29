@@ -30,6 +30,23 @@ Infuse the article with insights and personal anecdotes, reflecting extensive ex
 Note: the final content should not be structured like , Topic and Audience Understanding:, Logical Body Development: etc. just return the content (it'll be used as the article body) , also don't include a title, only the content is needed `;
 
     return `Article description: ${article.description}, Article content: ${article.content}. ${instruction}`;
+  },
+  type_three: (article) => {
+    return `The article's topic is "${article.title}". The target audience includes business executives, techpreneurs, AI strategists, emerging technology experts, founders, and thought leaders who are interested in how new technologies are transforming the job market and creating new career opportunities.
+
+The central theme of this article should explore how the featured technology or trend is shaping the future of work. Focus on providing a forward-looking, optimistic perspective on the new and exciting job roles and skills that are emerging as a result of this technology.
+
+Begin with an engaging opening paragraph that highlights the rapid pace of technological change and the significant impact it is having on the job market. Use this as a hook to draw the reader in and set the stage for the article's key insights.
+
+In the body of the article, delve into real-world examples and case studies that illustrate how this technology is already being applied in the workplace. Discuss the new types of jobs and roles that are being created, as well as existing roles that are being transformed or augmented by this technology. Be sure to highlight the unique skills and qualifications that will be in high demand.
+
+Incorporate research findings, expert opinions, and personal anecdotes to add depth and credibility to your analysis. Weave a cohesive narrative that explores both the near-term and long-term implications of this technology for the future workforce.
+
+Conclude the article with a powerful statement that leaves the reader feeling inspired and optimistic about the career possibilities enabled by this emerging technology. Consider ending with a call to action that encourages the audience to start preparing for these new job opportunities.
+
+Maintain a sophisticated yet accessible tone throughout, providing insightful commentary that informs and engages your target audience of business leaders and technology experts.
+Do not use words like "In conclusion" or "In summary" in article
+`;
   }
 };
 
